@@ -1,84 +1,111 @@
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
-        <h1>Animations</h1>
-          <hr>
-          <select name="" id="" v-model="alertAnimation" class="form-control">
-              <option value="fade">Fade</option>
-              <option value="slide">Slide</option>
-          </select>
-          <br>
-          <button class="btn btn-primary" @click="show = !show">Show Alert</button>
-          <br><br>
-          <transition :name="alertAnimation">
-              <div class="alert alert-info" v-show="show">This is some Info</div>
-          </transition>
-          <transition name="slide" type="animation" appear>
-              <div class="alert alert-info" v-if="show">This is some Info</div>
-          </transition>
-          <transition  enter-active-class="animated bounce" leave-active-class="animated shake">
-              <div class="alert alert-info" v-if="show">This is some Info</div>
-          </transition>
-          <transition :name="alertAnimation" mode="out-in">
-              <div class="alert alert-info" v-if="show" key="info">This is some Info</div>
-              <div class="alert alert-warning" v-else key="warning">This is some Warning</div>
-          </transition>
-          <hr>
-          <button class="btn btn-primary" @click="load = !load">Load / Remove Element</button>
-          <br><br>
-          <transition
-              @before-enter="beforeEnter"
-              @enter="enter"
-              @after-enter="afterEnter"
-              @enter-cancelled="enterCancelled"
-              @before-leave="beforeLeave" @leave="leave" @after-leave="afterLeave" @leave-cancelled="leaveCancelled">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+                <h1>Animations</h1>
+                <hr>
+                <select name="" id="" v-model="alertAnimation" class="form-control">
+                    <option value="fade">Fade</option>
+                    <option value="slide">Slide</option>
+                </select>
+                <br>
+                <button class="btn btn-primary" @click="show = !show">Show Alert</button>
+                <br><br>
+                <transition :name="alertAnimation">
+                    <div class="alert alert-info" v-show="show">This is some Info</div>
+                </transition>
+                <transition name="slide" type="animation" appear>
+                    <div class="alert alert-info" v-if="show">This is some Info</div>
+                </transition>
+                <transition  enter-active-class="animated bounce" leave-active-class="animated shake">
+                    <div class="alert alert-info" v-if="show">This is some Info</div>
+                </transition>
+                <transition :name="alertAnimation" mode="out-in">
+                    <div class="alert alert-info" v-if="show" key="info">This is some Info</div>
+                    <div class="alert alert-warning" v-else key="warning">This is some Warning</div>
+                </transition>
+                <hr>
+                <button class="btn btn-primary" @click="load = !load">Load / Remove Element</button>
+                <br><br>
+                <transition
+                        @before-enter="beforeEnter"
+                        @enter="enter"
+                        @after-enter="afterEnter"
+                        @enter-cancelled="enterCancelled"
+                        @before-leave="beforeLeave"
+                        @leave="leave"
+                        @after-leave="afterLeave"
+                        @leave-cancelled="leaveCancelled"
+                        :css="false">
 
-              <div style="width: 100px; height: 100px; background-color: lightgreen" v-if="load"></div>
-          </transition>
-      </div>
+                    <div style="width: 300px; height: 100px; background-color: lightgreen" v-if="load"></div>
+                </transition>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
-export default {
-  data () {
-    return {
-        show: false,
-        load: true,
-        alertAnimation: 'fade'
-    }
-  },
-    methods: {
-      beforeEnter(el) {
-          console.log('beforeEnter');
-      },
-        enter(el, done) {
-            console.log('enter');
-            done();
+    export default {
+        data () {
+            return {
+                show: false,
+                load: true,
+                alertAnimation: 'fade',
+                elementWidth: 100
+            }
         },
-        afterEnter(el) {
-            console.log('afterEnter');
-        },
-        enterCancelled(el) {
-            console.log('enterCancelled');
-        },
-        beforeLeave(el) {
-            console.log('beforeLeave');
-        },
-        leave(el, done) {
-            console.log('leave');
-            done();
-        },
-        afterLeave(el) {
-          console.log('afterLeave');
-        },
-        leaveCancelled(el) {
-          console.log('leaveCancelled');
+        methods: {
+            beforeEnter(el) {
+                console.log('beforeEnter');
+                this.elementWidth = 100;
+                el.style.width = this.elementWidth + 'px';
+            },
+            enter(el, done) {
+                console.log('enter');
+                let round = 1;
+                const interval = setInterval(() => {
+                    el.style.width = (this.elementWidth + round * 10) + 'px';
+                    round++;
+                    if (round > 20) {
+                        clearInterval(interval);
+                        done();
+                    }
+                }, 20);
+                done();
+            },
+            afterEnter(el) {
+                console.log('afterEnter');
+            },
+            enterCancelled(el) {
+                console.log('enterCancelled');
+            },
+            beforeLeave(el) {
+                console.log('beforeLeave');
+                this.elementWidth = 300;
+
+                el.style.width = this.elementWidth + 'px';
+            },
+            leave(el, done) {
+                console.log('leave');
+                let round = 1;
+                const interval = setInterval(() => {
+                    el.style.width = (this.elementWidth - round * 10) + 'px';
+                    round++;
+                    if (round > 20) {
+                        clearInterval(interval);
+                        done();
+                    }
+                }, 20);
+            },
+            afterLeave(el) {
+                console.log('afterLeave');
+            },
+            leaveCancelled(el) {
+                console.log('leaveCancelled');
+            }
         }
     }
-}
 </script>
 
 <style>
@@ -87,7 +114,7 @@ export default {
     }
 
     .fade-enter-active {
-       transition: opacity 1s;
+        transition: opacity 1s;
     }
 
     .fade-leave {
